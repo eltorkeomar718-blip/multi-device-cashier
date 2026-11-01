@@ -3,65 +3,40 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0f172a">
-  <title>كاشير - إدارة المبيعات</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="theme-color" content="#172b4d">
+  <title>نظام الكاشير وإدارة المحل</title>
+  <link rel="stylesheet" href="style.css?v=3">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
+  <script src="app.js?v=3" defer></script>
 </head>
 <body>
-  <main class="shell">
-    <header class="topbar">
-      <a class="brand" href="#" aria-label="الرئيسية"><span class="brand-mark">ك</span><span>كاشير</span></a>
-    </header>
-
-    <section id="loginView" class="login-view">
-      <div class="login-card">
-        <div class="eyebrow">نظام نقاط البيع</div>
-        <h1>أهلاً بك</h1>
-        <p class="muted">جارٍ فتح الكاشير...</p>
-        <p id="loginError" class="error" role="alert"></p>
+  <div id="application" class="application">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-mark small">ك</div>
+        <div><strong>نظام الكاشير</strong><span>إدارة المحل</span></div>
       </div>
-    </section>
-
-    <section id="appView" class="app-view hidden">
-      <div class="page-heading">
-        <div><div class="eyebrow">لوحة التحكم</div><h1>إدارة الكاشير</h1></div>
-        <div class="sync-state"><span class="sync-dot"></span><span id="syncText">متصل</span></div>
-      </div>
-      <div class="stats-grid">
-        <article class="stat-card"><span>المنتجات</span><strong id="productCount">0</strong></article>
-        <article class="stat-card"><span>مبيعات اليوم</span><strong id="todayTotal">٠٫٠٠ ج.م</strong></article>
-        <article class="stat-card"><span>عدد الفواتير اليوم</span><strong id="todaySales">0</strong></article>
-      </div>
-      <div class="workspace-grid">
-        <section class="panel products-panel">
-          <div class="panel-heading"><div><h2>المنتجات</h2><p class="muted">ابحث وأضف المنتجات إلى الفاتورة</p></div><button id="addProductToggle" class="button button-secondary">إضافة منتج</button></div>
-          <form id="productForm" class="product-form hidden">
-            <label>اسم المنتج<input id="productName" maxlength="120" required></label>
-            <label>السعر (ج.م)<input id="productPrice" type="number" min="0.01" step="0.01" required></label>
-            <label>الكمية<input id="productStock" type="number" min="0" step="1" value="0" required></label>
-            <button class="button button-primary" type="submit">حفظ المنتج</button>
-          </form>
-          <label class="search-box"><span>⌕</span><input id="searchInput" type="search" placeholder="ابحث عن منتج"></label>
-          <div id="productsList" class="products-list"></div>
-          <div id="productsEmpty" class="empty-state hidden">لا توجد منتجات بعد. أضف أول منتج للبدء.</div>
-        </section>
-        <aside class="panel cart-panel">
-          <div class="panel-heading"><div><h2>الفاتورة الحالية</h2><p class="muted"><span id="cartCount">0</span> أصناف</p></div><button id="clearCartButton" class="text-button">تفريغ</button></div>
-          <div id="cartList" class="cart-list"><div class="empty-state">اختر المنتجات لإضافتها للفاتورة.</div></div>
-          <div class="cart-footer"><div class="total-row"><span>الإجمالي</span><strong id="cartTotal">٠٫٠٠ ج.م</strong></div><button id="checkoutButton" class="button button-primary button-wide" disabled>إتمام البيع</button></div>
-          <p id="appMessage" class="message" role="status"></p>
-        </aside>
-      </div>
-      <section class="panel recent-panel">
-        <div class="panel-heading"><div><h2>آخر المبيعات</h2><p class="muted">تتحدث البيانات تلقائياً على أجهزتك</p></div><button id="refreshButton" class="button button-quiet">تحديث</button></div>
-        <div class="table-wrap"><table><thead><tr><th>رقم الفاتورة</th><th>التاريخ</th><th>الإجمالي</th></tr></thead><tbody id="salesRows"></tbody></table></div>
-        <div id="salesEmpty" class="empty-state hidden">لا توجد مبيعات حتى الآن.</div>
-      </section>
-    </section>
-    <footer>تنبيه: بيانات المتجر متاحة لكل شخص يفتح هذا الرابط.</footer>
-  </main>
-  <script src="app.js"></script>
+      <nav id="main-nav" class="main-nav" aria-label="القائمة الرئيسية"></nav>
+      <div class="sidebar-footer"><span id="sidebar-user"></span></div>
+    </aside>
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">مساحة العمل</p>
+          <h1 id="page-title">الرئيسية</h1>
+        </div>
+        <div class="topbar-actions">
+          <span id="current-user" class="badge"></span>
+          <span id="active-inventory" class="badge"></span>
+          <button id="backup-button" class="button secondary" type="button">نسخة احتياطية</button>
+          <label class="button secondary import-button">استعادة نسخة<input id="restore-input" type="file" accept="application/json"></label>
+        </div>
+      </header>
+      <div id="toast" class="toast" role="status"></div>
+      <section id="page-content"></section>
+      <p class="public-warning">تنبيه: أي شخص لديه رابط التطبيق يستطيع مشاهدة بيانات المتجر وتعديلها.</p>
+    </main>
+  </div>
 </body>
 </html>
