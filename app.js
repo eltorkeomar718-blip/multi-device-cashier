@@ -4,8 +4,6 @@
   const config = window.CASHIER_CONFIG;
   const loginView = document.getElementById("loginView");
   const appView = document.getElementById("appView");
-  const accountBar = document.getElementById("accountBar");
-  const loginForm = document.getElementById("loginForm");
   const loginError = document.getElementById("loginError");
   const appMessage = document.getElementById("appMessage");
   const money = new Intl.NumberFormat("ar-EG", { style: "currency", currency: "EGP" });
@@ -23,13 +21,6 @@
   function setMessage(text, isError = false) {
     appMessage.textContent = text;
     appMessage.classList.toggle("error-text", isError);
-  }
-
-  function setLoggedIn(isLoggedIn, email = "") {
-    loginView.classList.toggle("hidden", isLoggedIn);
-    appView.classList.toggle("hidden", !isLoggedIn);
-    accountBar.classList.toggle("hidden", !isLoggedIn);
-    byId("accountEmail").textContent = email;
   }
 
   async function loadProducts() {
@@ -141,42 +132,6 @@
     });
   }
 
-  loginForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    loginError.textContent = "";
-    byId("loginInfo").classList.add("hidden");
-    const button = loginForm.querySelector("button[type=submit]");
-    button.disabled = true;
-    try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: byId("emailInput").value.trim(),
-        options: {
-          emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
-          shouldCreateUser: false
-        }
-      });
-      if (error) throw error;
-      byId("loginInfo").textContent = "أرسلنا رابط دخول إلى بريدك. افتحه من هذا الجهاز أو أي جهاز تريد استخدامه.";
-      byId("loginInfo").classList.remove("hidden");
-    } catch (error) {
-      loginError.textContent = `تعذّر إرسال رابط الدخول: ${error.message}`;
-    } finally {
-      button.disabled = false;
-    }
-  });
-
-  byId("logoutButton").addEventListener("click", async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      setMessage(`تعذّر تسجيل الخروج: ${error.message}`, true);
-      return;
-    }
-    clearInterval(refreshTimer);
-    cart.clear();
-    renderCart();
-    setLoggedIn(false);
-  });
-
   byId("addProductToggle").addEventListener("click", () => byId("productForm").classList.toggle("hidden"));
   byId("searchInput").addEventListener("input", renderProducts);
   byId("clearCartButton").addEventListener("click", () => { cart.clear(); renderCart(); setMessage(""); });
@@ -230,20 +185,12 @@
   if (!config || !config.supabaseUrl || config.supabaseUrl.startsWith("YOUR_") ||
       !config.supabaseAnonKey || config.supabaseAnonKey.startsWith("YOUR_")) {
     loginError.textContent = "أكمل إعداد رابط Supabase والمفتاح في config.js أولاً.";
-    loginForm.querySelector("button[type=submit]").disabled = true;
     return;
   }
 
   supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
-  supabase.auth.getSession().then(({ data, error }) => {
-    if (error) {
-      loginError.textContent = `تعذّر التحقق من الجلسة: ${error.message}`;
-      return;
-    }
-    if (data.session) {
-      setLoggedIn(true, data.session.user.email);
-      refreshData();
-      refreshTimer = setInterval(refreshData, 15000);
-    }
-  });
+  loginView.classList.add("hidden");
+  appView.classList.remove("hidden");
+  refreshData();
+  refreshTimer = setInterval(refreshData, 15000);
 })();
