@@ -26,7 +26,7 @@ create index products_store_active_name_idx on public.products (store_id, active
 create table public.sales (
   id uuid primary key default gen_random_uuid(),
   store_id uuid not null references public.stores(id) on delete restrict,
-  cashier_id uuid not null references auth.users(id) on delete restrict,
+  cashier_id uuid references auth.users(id) on delete restrict,
   total numeric(12, 2) not null check (total >= 0),
   created_at timestamptz not null default now()
 );
@@ -57,26 +57,29 @@ stable
 security definer
 set search_path = public, pg_temp
 as $$
-  select store_id from public.profiles where user_id = auth.uid()
+  select coalesce(
+    (select store_id from public.profiles where user_id = auth.uid()),
+    (select id from public.stores order by created_at, id limit 1)
+  )
 $$;
 
 revoke all on function public.current_store_id() from public, anon;
-grant execute on function public.current_store_id() to authenticated;
+grant execute on function public.current_store_id() to anon, authenticated;
 
 create policy "Users read their own profile"
   on public.profiles for select to authenticated
   using (user_id = auth.uid());
 
 create policy "Users read their store"
-  on public.stores for select to authenticated
+  on public.stores for select to anon, authenticated
   using (id = public.current_store_id());
 
 create policy "Users read their store products"
-  on public.products for select to authenticated
+  on public.products for select to anon, authenticated
   using (store_id = public.current_store_id());
 
 create policy "Users add products to their store"
-  on public.products for insert to authenticated
+  on public.products for insert to anon, authenticated
   with check (store_id = public.current_store_id());
 
 create policy "Users update products in their store"
@@ -85,11 +88,11 @@ create policy "Users update products in their store"
   with check (store_id = public.current_store_id());
 
 create policy "Users read their store sales"
-  on public.sales for select to authenticated
+  on public.sales for select to anon, authenticated
   using (store_id = public.current_store_id());
 
 create policy "Users read items from their store sales"
-  on public.sale_items for select to authenticated
+  on public.sale_items for select to anon, authenticated
   using (
     exists (
       select 1 from public.sales
@@ -111,13 +114,9 @@ declare
   v_item record;
   v_product public.products%rowtype;
 begin
-  if auth.uid() is null then
-    raise exception 'Authentication required';
-  end if;
-
   v_store_id := public.current_store_id();
   if v_store_id is null then
-    raise exception 'No store is assigned to this account';
+    raise exception 'No store is configured';
   end if;
 
   if p_items is null or jsonb_typeof(p_items) <> 'array' then
@@ -169,9 +168,11 @@ end;
 $$;
 
 revoke all on function public.checkout_sale(jsonb) from public, anon;
-grant execute on function public.checkout_sale(jsonb) to authenticated;
+grant execute on function public.checkout_sale(jsonb) to anon, authenticated;
 
 revoke all on all tables in schema public from anon, authenticated;
-grant usage on schema public to authenticated;
-grant select on public.stores, public.profiles, public.products, public.sales, public.sale_items to authenticated;
+grant usage on schema public to anon, authenticated;
+grant select on public.stores, public.products, public.sales, public.sale_items to anon, authenticated;
+grant select on public.profiles to authenticated;
+grant insert on public.products to anon;
 grant insert, update on public.products to authenticated;
