@@ -116,7 +116,7 @@ declare
 begin
   v_store_id := public.current_store_id();
   if v_store_id is null then
-    raise exception 'No store is configured';
+    raise exception 'No store is assigned to this account';
   end if;
 
   if p_items is null or jsonb_typeof(p_items) <> 'array' then
@@ -176,3 +176,117 @@ grant select on public.stores, public.products, public.sales, public.sale_items 
 grant select on public.profiles to authenticated;
 grant insert on public.products to anon;
 grant insert, update on public.products to authenticated;
+
+create table if not exists public.cashier_state (
+  id smallint primary key default 1 check (id = 1),
+  revision bigint not null default 0 check (revision >= 0),
+  payload jsonb not null,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.cashier_state enable row level security;
+revoke all on public.cashier_state from public, anon, authenticated;
+
+insert into public.cashier_state (id, payload)
+values (
+  1,
+  '{
+    "version": 1,
+    "initialized": true,
+    "products": [],
+    "customers": [],
+    "suppliers": [],
+    "sales": [],
+    "parkedSales": [],
+    "purchases": [],
+    "payments": [],
+    "inventorySessions": [],
+    "shifts": [],
+    "receiptSettings": {
+      "shopName": "اسم المحل",
+      "phone": "",
+      "address": "",
+      "header": "",
+      "footer": "شكرًا لزيارتكم",
+      "paperWidth": "80",
+      "fontSize": 13,
+      "showPhone": true,
+      "showAddress": true,
+      "showDate": true,
+      "showReceiptNumber": true,
+      "showCustomer": true,
+      "showCashier": true,
+      "showSku": true,
+      "showDelivery": true,
+      "showPaid": true
+    }
+  }'::jsonb
+)
+on conflict (id) do nothing;
+
+create or replace function public.load_cashier_state()
+returns jsonb
+language sql
+stable
+security definer
+set search_path = public, pg_temp
+as $$
+  select jsonb_build_object('revision', revision, 'data', payload)
+  from public.cashier_state
+  where id = 1
+$$;
+
+create or replace function public.save_cashier_state(p_revision bigint, p_data jsonb)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  v_revision bigint;
+begin
+  if p_data is null or jsonb_typeof(p_data) <> 'object' then
+    raise exception 'بيانات الحفظ غير صالحة';
+  end if;
+  if octet_length(p_data::text) > 4000000 then
+    raise exception 'حجم بيانات المتجر تجاوز الحد المسموح';
+  end if;
+  if jsonb_typeof(p_data->'products') <> 'array'
+    or jsonb_typeof(p_data->'customers') <> 'array'
+    or jsonb_typeof(p_data->'suppliers') <> 'array'
+    or jsonb_typeof(p_data->'sales') <> 'array'
+    or jsonb_typeof(p_data->'purchases') <> 'array'
+    or jsonb_typeof(p_data->'payments') <> 'array'
+    or jsonb_typeof(p_data->'inventorySessions') <> 'array'
+    or jsonb_typeof(p_data->'shifts') <> 'array' then
+    raise exception 'بيانات المتجر غير مكتملة';
+  end if;
+
+  select revision into v_revision
+  from public.cashier_state
+  where id = 1
+  for update;
+
+  if v_revision is null then
+    raise exception 'بيانات المتجر غير مهيأة';
+  end if;
+  if p_revision <> v_revision then
+    raise exception 'تعارض في التحديث: أعد تحميل البيانات وحاول مرة أخرى'
+      using errcode = '40001';
+  end if;
+
+  update public.cashier_state
+  set payload = p_data - 'users',
+      revision = revision + 1,
+      updated_at = now()
+  where id = 1
+  returning revision into v_revision;
+
+  return jsonb_build_object('revision', v_revision);
+end;
+$$;
+
+revoke all on function public.load_cashier_state() from public, anon, authenticated;
+revoke all on function public.save_cashier_state(bigint, jsonb) from public, anon, authenticated;
+grant execute on function public.load_cashier_state() to anon, authenticated;
+grant execute on function public.save_cashier_state(bigint, jsonb) to anon, authenticated;
