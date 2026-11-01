@@ -25,7 +25,21 @@
           <label>البريد الإلكتروني<input id="emailInput" type="email" autocomplete="username" required></label>
           <label>كلمة المرور<input id="passwordInput" type="password" autocomplete="current-password" required></label>
           <button class="button button-primary" type="submit">تسجيل الدخول</button>
+          <button id="forgotPasswordButton" class="link-button" type="button">نسيت كلمة المرور؟</button>
+          <p id="loginInfo" class="success hidden" role="status"></p>
           <p id="loginError" class="error" role="alert"></p>
+        </form>
+        <form id="recoveryForm" class="form-stack hidden">
+          <label>البريد الإلكتروني<input id="recoveryEmail" type="email" autocomplete="email" required></label>
+          <button class="button button-primary" type="submit">إرسال رابط تغيير كلمة المرور</button>
+          <button id="backToLoginButton" class="link-button" type="button">العودة لتسجيل الدخول</button>
+          <p id="recoveryMessage" class="message" role="status"></p>
+        </form>
+        <form id="updatePasswordForm" class="form-stack hidden">
+          <label>كلمة المرور الجديدة<input id="newPassword" type="password" minlength="8" autocomplete="new-password" required></label>
+          <label>تأكيد كلمة المرور<input id="confirmPassword" type="password" minlength="8" autocomplete="new-password" required></label>
+          <button class="button button-primary" type="submit">حفظ كلمة المرور</button>
+          <p id="passwordUpdateMessage" class="message" role="status"></p>
         </form>
       </div>
     </section>

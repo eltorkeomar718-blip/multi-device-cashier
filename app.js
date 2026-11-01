@@ -6,6 +6,8 @@
   const appView = document.getElementById("appView");
   const accountBar = document.getElementById("accountBar");
   const loginForm = document.getElementById("loginForm");
+  const recoveryForm = document.getElementById("recoveryForm");
+  const updatePasswordForm = document.getElementById("updatePasswordForm");
   const loginError = document.getElementById("loginError");
   const appMessage = document.getElementById("appMessage");
   const money = new Intl.NumberFormat("ar-EG", { style: "currency", currency: "EGP" });
@@ -144,6 +146,7 @@
   loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     loginError.textContent = "";
+    byId("loginInfo").classList.add("hidden");
     const button = loginForm.querySelector("button[type=submit]");
     button.disabled = true;
     try {
@@ -158,6 +161,65 @@
       refreshTimer = setInterval(refreshData, 15000);
     } catch (error) {
       loginError.textContent = `تعذّر تسجيل الدخول: ${error.message}`;
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  byId("forgotPasswordButton").addEventListener("click", () => {
+    byId("recoveryEmail").value = byId("emailInput").value.trim();
+    loginForm.classList.add("hidden");
+    recoveryForm.classList.remove("hidden");
+    loginError.textContent = "";
+  });
+
+  byId("backToLoginButton").addEventListener("click", () => {
+    recoveryForm.classList.add("hidden");
+    loginForm.classList.remove("hidden");
+    byId("recoveryMessage").textContent = "";
+  });
+
+  recoveryForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = recoveryForm.querySelector("button[type=submit]");
+    button.disabled = true;
+    byId("recoveryMessage").classList.remove("error-text");
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(byId("recoveryEmail").value.trim(), {
+        redirectTo: `${window.location.origin}${window.location.pathname}`
+      });
+      if (error) throw error;
+      byId("recoveryMessage").textContent = "إذا كان البريد مسجلاً، سيصلك رابط لتغيير كلمة المرور.";
+    } catch (error) {
+      byId("recoveryMessage").textContent = `تعذّر إرسال الرابط: ${error.message}`;
+      byId("recoveryMessage").classList.add("error-text");
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  updatePasswordForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = updatePasswordForm.querySelector("button[type=submit]");
+    const message = byId("passwordUpdateMessage");
+    if (byId("newPassword").value !== byId("confirmPassword").value) {
+      message.textContent = "كلمتا المرور غير متطابقتين.";
+      message.classList.add("error-text");
+      return;
+    }
+    button.disabled = true;
+    try {
+      const { data, error } = await supabase.auth.updateUser({ password: byId("newPassword").value });
+      if (error) throw error;
+      updatePasswordForm.classList.add("hidden");
+      loginForm.classList.remove("hidden");
+      byId("loginInfo").textContent = "تم تغيير كلمة المرور. سجّل الدخول الآن.";
+      byId("loginInfo").classList.remove("hidden");
+      byId("emailInput").value = data.user.email || byId("recoveryEmail").value;
+      byId("passwordInput").value = "";
+    } catch (error) {
+      message.textContent = `تعذّر تغيير كلمة المرور: ${error.message}`;
+      message.classList.add("error-text");
     } finally {
       button.disabled = false;
     }
@@ -233,6 +295,13 @@
   }
 
   supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+  supabase.auth.onAuthStateChange((event) => {
+    if (event === "PASSWORD_RECOVERY") {
+      loginForm.classList.add("hidden");
+      recoveryForm.classList.add("hidden");
+      updatePasswordForm.classList.remove("hidden");
+    }
+  });
   supabase.auth.getSession().then(({ data, error }) => {
     if (error) {
       loginError.textContent = `تعذّر التحقق من الجلسة: ${error.message}`;
