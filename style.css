@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap');
+
+:root{font-family:"Cairo",Tahoma,Arial,sans-serif;color:#172033;background:#f4f6fb;font-synthesis:none;text-rendering:optimizeLegibility}
+*{box-sizing:border-box}
+body{margin:0;min-width:320px}
+button,input{font:inherit}
+button{cursor:pointer}
+.shell{width:min(1180px,calc(100% - 36px));margin:0 auto}
+.topbar{height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e6eaf1}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;color:#172033;text-decoration:none}
+.brand-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#2563eb;color:#fff}
+.account{display:flex;align-items:center;gap:14px;color:#64748b;font-size:13px}
+.hidden{display:none!important}
+.login-view{min-height:calc(100vh - 146px);display:grid;place-items:center;padding:40px 0}
+.login-card{width:min(430px,100%);background:#fff;border:1px solid #e7ebf2;border-radius:20px;padding:34px;box-shadow:0 12px 40px #1720330b}
+h1,h2,p{margin-top:0}
+h1{font-size:30px;margin-bottom:8px;letter-spacing:-.4px}
+h2{font-size:18px;margin:0 0 3px}
+.eyebrow{font-size:12px;color:#2563eb;font-weight:800;margin-bottom:8px}
+.muted{color:#8190a5;font-size:13px;margin:0}
+.form-stack{display:grid;gap:16px;margin-top:24px}
+label{display:grid;gap:7px;font-size:13px;font-weight:700;color:#354258}
+input{width:100%;height:44px;border:1px solid #dfe5ee;border-radius:10px;padding:0 12px;background:#fff;color:#172033;outline:none}
+input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px #3b82f61a}
+.button{border:0;border-radius:10px;padding:10px 16px;font-weight:700;font-size:13px;transition:background .15s,transform .15s}
+.button:active{transform:translateY(1px)}
+.button-primary{background:#2563eb;color:#fff}
+.button-primary:hover{background:#1d4ed8}
+.button-primary:disabled{background:#a9bddf;cursor:not-allowed}
+.button-secondary{background:#eaf1ff;color:#2156bc}
+.button-secondary:hover{background:#dae7ff}
+.button-quiet{background:transparent;color:#607089}
+.button-quiet:hover{background:#edf1f7}
+.button-wide{width:100%;height:48px}
+.error{color:#c62828;font-size:13px;min-height:18px;margin:0}
+.app-view{padding:30px 0 40px}
+.page-heading,.panel-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.page-heading{margin-bottom:20px}
+.page-heading h1{margin:0}
+.sync-state{display:flex;align-items:center;gap:8px;color:#718096;font-size:12px}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px #22c55e1b}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.stat-card,.panel{background:#fff;border:1px solid #e7ebf2;border-radius:16px}
+.stat-card{padding:16px 19px;display:grid;gap:6px;color:#718096;font-size:12px}
+.stat-card strong{font-size:23px;color:#172033}
+.workspace-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,.85fr);gap:16px;align-items:start}
+.panel{padding:20px}
+.panel-heading{margin-bottom:18px}
+.product-form{display:grid;grid-template-columns:1.3fr 1fr .8fr auto;align-items:end;gap:10px;padding:14px;background:#f6f8fc;border-radius:12px;margin-bottom:16px}
+.product-form label{font-size:11px}
+.product-form input{height:40px}
+.search-box{display:flex;align-items:center;gap:8px;border:1px solid #e4e9f1;border-radius:10px;padding:0 12px;margin-bottom:14px;color:#8a98ab}
+.search-box input{border:0;box-shadow:none;padding:0}
+.products-list{display:grid;gap:8px;max-height:430px;overflow:auto}
+.product-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid #edf0f5;border-radius:11px}
+.product-title{font-size:13px;font-weight:700}
+.product-meta{font-size:11px;color:#8591a3;margin-top:2px}
+.product-price{font-size:13px;font-weight:800;white-space:nowrap}
+.add-item{width:34px;height:34px;border:0;border-radius:9px;background:#eef4ff;color:#2563eb;font-size:20px}
+.add-item:hover{background:#dce9ff}
+.cart-panel{position:sticky;top:14px}
+.cart-list{display:grid;gap:10px;min-height:120px;max-height:340px;overflow:auto}
+.cart-row{display:grid;grid-template-columns:1fr auto;gap:6px;padding-bottom:10px;border-bottom:1px solid #edf0f5}
+.cart-name{font-size:12px;font-weight:700}
+.cart-subtotal{font-size:12px;font-weight:700}
+.quantity-controls{display:flex;align-items:center;gap:8px;color:#64748b;font-size:12px}
+.quantity-controls button{border:1px solid #e3e8f0;background:#fff;border-radius:6px;width:25px;height:25px}
+.cart-footer{border-top:1px solid #e8edf4;margin-top:14px;padding-top:14px}
+.total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:13px}
+.total-row strong{font-size:19px}
+.text-button{border:0;background:transparent;color:#d34b4b;font-size:12px}
+.message{min-height:18px;text-align:center;margin:10px 0 0;font-size:12px;color:#227649}
+.message.error-text{color:#c62828}
+.recent-panel{margin-top:16px}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;text-align:right;font-size:12px}
+th,td{padding:11px 8px;border-bottom:1px solid #edf0f5}
+th{color:#7a8799;font-weight:600}
+td{font-weight:600}
+.empty-state{display:grid;place-items:center;min-height:110px;text-align:center;color:#8a97a8;font-size:12px}
+footer{text-align:center;padding:18px 0 26px;color:#929daf;font-size:11px}
+@media(max-width:850px){.workspace-grid{grid-template-columns:1fr}.cart-panel{position:static}.product-form{grid-template-columns:1fr 1fr}.product-form button{grid-column:span 2}}
+@media(max-width:540px){.shell{width:calc(100% - 22px)}.topbar{height:64px}.account{gap:4px}.account span{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.page-heading h1{font-size:24px}.stats-grid{gap:8px}.stat-card{padding:12px 10px}.stat-card strong{font-size:17px}.panel{padding:15px}.panel-heading{align-items:flex-start}.product-form{grid-template-columns:1fr}.product-form button{grid-column:auto}.login-card{padding:25px 20px}}
