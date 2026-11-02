@@ -5,6 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#172b4d">
   <title>نظام الكاشير وإدارة المحل</title>
+  <link rel="stylesheet" href="style.css?v=4">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js?v=4" defer></script>
+</head>
+<body>
+  <main id="auth-screen" class="auth-screen">
+    <section class="auth-card">
+      <div class="brand-mark">ك</div>
+      <h1>تسجيل الدخول</h1>
+      <p class="muted">اختر الحساب وأدخل كلمة المرور الخاصة به.</p>
+      <form id="auth-form" class="stack">
+        <label>الحساب<select name="username" id="auth-account" required></select></label>
+        <label>كلمة المرور<input name="password" type="password" required autocomplete="current-password"></label>
+        <p id="auth-error" class="form-error" role="alert"></p>
+        <button id="auth-submit" class="button primary wide" type="submit" disabled>دخول</button>
+      </form>
+      <p class="security-note">صلاحيات كل حساب يحددها حساب ist. لا تشارك كلمة المرور مع الآخرين.</p>
+    </section>
+  </main>
+  <div id="application" class="application hidden">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-mark small">ك</div>
+        <div><strong>نظام الكاشير</strong><span>إدارة المحل</span></div>
+      </div>
+      <nav id="main-nav" class="main-nav" aria-label="القائمة الرئيسية"></nav>
+      <div class="sidebar-footer"><span id="sidebar-user"></span></div>
+    </aside>
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">مساحة العمل</p>
+          <h1 id="page-title">الرئيسية</h1>
+        </div>
+        <div class="topbar-actions">
+          <span id="current-user" class="badge"></span>
+          <span id="active-inventory" class="badge"></span>
+          <button id="logout-button" class="button secondary" type="button">تسجيل الخروج</button>
+          <button id="backup-button" class="button secondary" type="button">نسخة احتياطية</button>
+          <label class="button secondary import-button">استعادة نسخة<input id="restore-input" type="file" accept="application/json"></label>
+        </div>
+      </header>
+      <div id="toast" class="toast" role="status"></div>
+      <section id="page-content"></section>
+    </main>
+  </div>
+</body>
+</html>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#172b4d">
+  <title>نظام الكاشير وإدارة المحل</title>
   <link rel="stylesheet" href="style.css?v=3">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
