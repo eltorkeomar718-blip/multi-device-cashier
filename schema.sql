@@ -63,23 +63,23 @@ as $$
   )
 $$;
 
-revoke all on function public.current_store_id() from public, anon;
-grant execute on function public.current_store_id() to anon, authenticated;
+revoke all on function public.current_store_id() from public, anon, authenticated;
+grant execute on function public.current_store_id() to authenticated;
 
 create policy "Users read their own profile"
   on public.profiles for select to authenticated
   using (user_id = auth.uid());
 
 create policy "Users read their store"
-  on public.stores for select to anon, authenticated
+  on public.stores for select to authenticated
   using (id = public.current_store_id());
 
 create policy "Users read their store products"
-  on public.products for select to anon, authenticated
+  on public.products for select to authenticated
   using (store_id = public.current_store_id());
 
 create policy "Users add products to their store"
-  on public.products for insert to anon, authenticated
+  on public.products for insert to authenticated
   with check (store_id = public.current_store_id());
 
 create policy "Users update products in their store"
@@ -88,11 +88,11 @@ create policy "Users update products in their store"
   with check (store_id = public.current_store_id());
 
 create policy "Users read their store sales"
-  on public.sales for select to anon, authenticated
+  on public.sales for select to authenticated
   using (store_id = public.current_store_id());
 
 create policy "Users read items from their store sales"
-  on public.sale_items for select to anon, authenticated
+  on public.sale_items for select to authenticated
   using (
     exists (
       select 1 from public.sales
@@ -167,14 +167,13 @@ begin
 end;
 $$;
 
-revoke all on function public.checkout_sale(jsonb) from public, anon;
-grant execute on function public.checkout_sale(jsonb) to anon, authenticated;
+revoke all on function public.checkout_sale(jsonb) from public, anon, authenticated;
+grant execute on function public.checkout_sale(jsonb) to authenticated;
 
-revoke all on all tables in schema public from anon, authenticated;
-grant usage on schema public to anon, authenticated;
-grant select on public.stores, public.products, public.sales, public.sale_items to anon, authenticated;
+revoke all on all tables in schema public from public, anon, authenticated;
+grant usage on schema public to authenticated;
+grant select on public.stores, public.products, public.sales, public.sale_items to authenticated;
 grant select on public.profiles to authenticated;
-grant insert on public.products to anon;
 grant insert, update on public.products to authenticated;
 
 create table if not exists public.cashier_state (
@@ -286,7 +285,7 @@ begin
 end;
 $$;
 
-revoke all on function public.load_cashier_state() from public, anon, authenticated;
-revoke all on function public.save_cashier_state(bigint, jsonb) from public, anon, authenticated;
-grant execute on function public.load_cashier_state() to anon, authenticated;
-grant execute on function public.save_cashier_state(bigint, jsonb) to anon, authenticated;
+revoke all on all tables in schema public from public, anon, authenticated;
+revoke all on all sequences in schema public from public, anon, authenticated;
+revoke all on all functions in schema public from public, anon, authenticated;
+grant usage on schema public to authenticated;

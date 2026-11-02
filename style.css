@@ -101,7 +101,6 @@ tr:last-child td { border-bottom: 0; }
 .permission-list label { display: flex; align-items: center; gap: 8px; font-weight: 500; }
 .permission-list input { width: 17px; min-height: 17px; }
 .notice { padding: 12px 14px; border-radius: 10px; color: #6a5018; background: #fff6df; font-size: .82rem; line-height: 1.8; }
-.public-warning { padding: 10px 12px; margin: 20px 0 0; border-radius: 9px; color: #7a5410; background: #fff4d8; font-size: .78rem; text-align: center; }
 .receipt { width: min(100%, var(--receipt-width, 80mm)); max-width: var(--receipt-width, 80mm); margin: 0 auto; color: #151515; background: #fff; font-size: var(--receipt-font, 13px); }
 .receipt h2, .receipt p { text-align: center; }
 .receipt-header { padding-bottom: 8px; border-bottom: 1px dashed #9aa2ad; text-align: center; }
